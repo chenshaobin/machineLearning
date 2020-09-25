@@ -33,7 +33,7 @@ def get_y(df):
     return np.array(df.iloc[:, -1])     # df的最后一列
 
 
-# print(get_y(df))
+# print(get_y(data))
 X = get_X(data)
 y = get_y(data)
 # print(y.shape, type(y))
@@ -51,7 +51,7 @@ def normalize_feature(df):
 """
 
 # 参数向量𝜃
-theta = np.zeros(X.shape[1])  #X.shape[1]=2,代表特征数n
+theta = np.zeros(X.shape[1])  # X.shape[1]=2,代表特征数n
 
 
 def lr_cost(theta, X, y):
@@ -63,7 +63,7 @@ def lr_cost(theta, X, y):
     :return: 代价函数值
     """
     m = X.shape[0]   # 样本数
-    inner = X @ theta - y       # 矩阵乘以向量，等价于X.dot(theta)
+    inner = X @ theta - y       # 矩阵乘以向量，等价于X.dot(theta),矩阵相乘
     """
         # 1*m @ m*1 = 1*1 in matrix multiplication
         # but you know numpy didn't do transpose in 1d array, so here is just a
@@ -117,10 +117,12 @@ ax.set_xlabel('epoch')
 ax.set_ylabel('cost')
 plt.show()
 """
+
+"""
 b = final_theta[0]
 m = final_theta[1]
 plt.scatter(data.population, data.profit, label="Training data")
 plt.plot(data.population, data.population*m + b, label="Prediction")    # 画出假设函数
 plt.legend(loc=2)   # 左上角
 plt.show()
-
+"""
