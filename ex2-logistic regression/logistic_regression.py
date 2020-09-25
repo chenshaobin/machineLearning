@@ -54,7 +54,7 @@ theta = np.zeros(X.shape[1])    # n*1的ndarray数组,一维
 # print(theta.shape)
 # 计算代价函数
 def cost(theta, X, y):
-    return np.mean(-y * np.log(sigmoid(X @ theta)) - (1 - y) * np.log(1- sigmoid(X @ theta)))   # X @ theta与X.dot(theta)等价
+    return np.mean(-y * np.log(sigmoid(X @ theta)) - (1 - y) * np.log(1 - sigmoid(X @ theta)))   # X @ theta与X.dot(theta)等价
 
 test_cost = cost(theta, X, y)   # 测试初始代价函数值
 # print(test_cost)
@@ -88,7 +88,7 @@ equation_y = coef[0] + coef[1] * equation_x
 sns.set(context="notebook", style="ticks", font_scale=1.5)
 sns.lmplot('exam1', 'exam2', hue='admitted', data=data, height=6, fit_reg=False, scatter_kws={"s": 25})
 
-plt.plot(equation_x, equation_y, 'gray')
+plt.plot(equation_x, equation_y, 'gray')    # 画出决策边界线
 plt.xlim(0, 130)
 plt.ylim(0, 130)
 plt.title("Decision Boundary")
