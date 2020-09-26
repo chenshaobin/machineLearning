@@ -12,14 +12,16 @@ from sklearn.metrics import classification_report  # 这个包是评价报告
 df = pd.read_csv('ex2data2.txt', names=['test1', 'test2', 'accepted'])
 # print(df)
 # print(df.head())
-# 画出数据分布
 
+# 画出数据分布
+"""
 sns.set(context="notebook", style="ticks", font_scale=1.5)
 
 sns.lmplot('test1', 'test2', hue='accepted', data=df, height=6, fit_reg=False, scatter_kws={"s": 50})
 plt.title('Regularized Logistic Regression')
-# plt.show()
-
+plt.show()
+"""
+# 画出数据分布end
 def get_y(df):
     # 读取标签值
     return np.array(df.iloc[:, -1])     # df的最后一列
@@ -79,7 +81,7 @@ y = get_y(df)
 def regularized_cost(theta, X, y, l=1):
     # do not penalize theta_0
     theta_1_to_n = theta[1:]
-    regularized_term = (1 / (2 * len(X))) * np.power(theta_1_to_n, 2).sum()
+    regularized_term = (l / (2 * len(X))) * np.power(theta_1_to_n, 2).sum()
     return cost(theta, X, y) + regularized_term
 
 # 测试正则化代价函数
@@ -104,4 +106,63 @@ y_pred = predict(X, final_theta)
 analysis_result_report = classification_report(y, y_pred, target_names=['test1', 'test2'])
 # print(analysis_result_report)
 
-# 使用不同的l画出决策边界
+
+def regularized_logistic_regression(power, l):
+    """
+        # 将数据读取、特征映射、利用梯度下降计算最优参数统合在一个函数当中
+        #   power: int
+        #   l: int
+        #   return：final_theta
+    """
+
+    df = pd.read_csv('ex2data2.txt', names=['test1', 'test2', 'accepted'])
+    x1 = np.array(df.test1)
+    x2 = np.array(df.test2)
+    y = get_y(df)
+    X = feature_mapping(x1, x2, power=6, as_ndarray_flag=True)  # 获取数据，数组形式
+    theta = np.zeros(data.shape[1])  # n*1的ndarray数组,一维
+    # 尝试其它method方法,感觉区别不是特别大; args参数中应该带l，
+    res = opt.minimize(fun=regularized_cost, x0=theta, args=(X, y, l), method='TNC', jac=regularized_gradient)
+    final_theta  = res.x
+    return final_theta
+
+def find_decision_boundary(density, power, theta, threshold):
+    """
+    # 找到所有满足  𝑋×𝜃=0  的x
+    # 创建一个足够密集的x、y网格，利用参数theta，找到𝑋×𝜃足够小于0的特征，并利用其中的两组数据作为决策边界函数的x,y
+
+    :param density: 决定x、y取值的密集度
+    :param power: 决定多项式的幂
+    :param theta: 参数
+    :param threshold: 阈值设置
+    :return: 用于画出决策边界的x、y
+    """
+    t1 = np.linspace(-1, 1.5, density)
+    t2 = np.linspace(-1, 1.5, density)
+    cordinates = [(x, y) for x in t1 for y in t2]
+    x_cord, y_cord = zip(*cordinates)
+    mapped_cord = feature_mapping(x_cord, y_cord, power)    # return a dataFrame
+    inner_product = mapped_cord.values @ theta
+    decision = mapped_cord[np.abs(inner_product) < threshold]       # 找到𝑋×𝜃足够小于0的映射特征数据,这里的数据提取需要再斟酌斟酌
+    # print(decision)     # 测试
+    return decision.f10, decision.f01   # 因为是二位平面，则选择幂为1的数据，即x1,x2
+
+def draw_boundary(power, l):
+    """
+    :param power: polynomial power for mapped feature
+    :param l: 常数，作为λ值
+    :return: 图像
+    """
+    density = 1000
+    threshold = 2 * 10 ** -3
+    final_theta = regularized_logistic_regression(power, l)
+    x, y = find_decision_boundary(density, power, final_theta, threshold)
+    df = pd.read_csv('ex2data2.txt', names=['test1', 'test2', 'accepted'])
+    sns.lmplot('test1', 'test2', hue='accepted', data=df, height=8, fit_reg=False, scatter_kws={"s": 40})
+    plt.scatter(x, y, c='r', s=8)      # 画出散点图，红色
+    plt.title('Decision boundary')
+    plt.show()
+
+draw_boundary(power=6, l=1)
+# draw_boundary(power=6, l=0)     # 过拟合
+# draw_boundary(power=6, l=100)      # l过大，欠拟合效果
