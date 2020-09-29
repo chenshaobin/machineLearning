@@ -26,7 +26,7 @@ def load_data(path, transpose=True):
     # print('X:', X)
     # print(X.shape)
     if transpose:
-        # for this dataset, you need a transpose to get the orientation right,坐标系的转换
+        # for this dataset, you need a transpose to get the orientation right,坐标系的转换,显示图片的时候需要转置
         X = np.array([im.reshape((20, 20)).T for im in X])
         X = np.array([im.reshape(400) for im in X])
     return X, y
@@ -130,7 +130,7 @@ def predict(x, theta):
 
 """
 final_theta = logistic_regression(X, y[0])  # 仅仅训练判别一种数字，这里只是判别数字10
-# print(final_theta.shape)
+# print('final_theta.shape:', final_theta.shape)  # (401,)
 y_prep = predict(X, final_theta)
 print('Accurancy={}'.format(np.mean(y[0] == y_prep)))
 """

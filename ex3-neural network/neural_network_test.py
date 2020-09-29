@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio      # 读取mat文件
 import matplotlib
@@ -35,7 +34,7 @@ def load_data(path, transpose=True):
     return X, y
 
 def load_weight(path):
-    data = sio.loadmat("ex3weights.mat")
+    data = sio.loadmat(path)
     """
         theta_1 = data['Theta1']
         print(theta_1.shape)    # (25,401)
