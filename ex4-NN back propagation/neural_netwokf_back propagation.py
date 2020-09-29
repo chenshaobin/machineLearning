@@ -17,17 +17,18 @@ def load_data(path, transpose=True):
     data = sio.loadmat(path)
     # print(data)
     y = data.get('y')   # (5000,1)的二维数组
-    # print(y)
-    # print(y.shape)
+    # print('y_origin:', y)
+    # print('y_origin.shape:', y.shape)
     y = y.reshape(y.shape[0])   # 转换为（5000，）一维数组
-    # print(y)
-    # print(y.shape)
+    # print('y_change:', y)
+    # print('y.shape_change', y.shape)
     X = data.get('X')       # (5000,400),二维数组
     # print('X:', X)
     # print(X.shape)
     if transpose:
         # for this dataset, you need a transpose to get the orientation right,坐标系的转换,显示图片的时候需要转置
-        X = np.array([im.reshape((20, 20)).T for im in X])
+        X = np.array([im.reshape((20, 20)).T for im in X])      # (5000, 20, 20)
+        # print('X.shape:', X.shape)
         X = np.array([im.reshape(400) for im in X])
     return X, y
 
@@ -62,7 +63,7 @@ def plot_100_image(X):
 
 # 导入原始数据
 X_raw, y_raw = load_data('ex4data1.mat', transpose=False)
-X = np.insert(X_raw, 0, values=np.ones(X_raw.shape[0]), axis=1)     # 增加偏置单元
+X = np.insert(X_raw, 0, values=np.ones(X_raw.shape[0]), axis=1)     # 每一行增加一个偏置单元
 # print('X.shape:', X.shape)      # (5000, 401)
 # print('y_raw.shape:', y_raw.shape)  # (5000,)
 
@@ -251,7 +252,7 @@ def show_accuracy(theta, X, y):
     y_prep = np.argmax(h, axis=1) + 1
     print(classification_report(y, y_prep))
 
-show_accuracy(final_theta, X, y_answer)
+# show_accuracy(final_theta, X, y_answer)
 
 def plot_hidden_layer(theta):
     final_theta, _ = deserialize(theta)
@@ -266,4 +267,4 @@ def plot_hidden_layer(theta):
             plt.yticks(np.array([]))
     plt.show()
 
-plot_hidden_layer(final_theta)
+# plot_hidden_layer(final_theta)
