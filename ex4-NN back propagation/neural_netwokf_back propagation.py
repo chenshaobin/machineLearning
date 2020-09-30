@@ -68,7 +68,7 @@ X = np.insert(X_raw, 0, values=np.ones(X_raw.shape[0]), axis=1)     # 每一行�
 # print('y_raw.shape:', y_raw.shape)  # (5000,)
 
 def expand_y(y):
-    # 对y进行扩展 （5000，）-> ()
+    # 对y进行扩展 （5000，）-> (5000, 10)
     res = []
     for i in y:
         y_array = np.zeros(10)
@@ -85,7 +85,7 @@ theta1, theta2 = load_weight("ex4weights.mat")      # theta1:(25,401), theta2:(1
 
 def serialize(a, b):
     # 序列化矩阵
-    return np.concatenate((np.ravel(a), np.ravel(b)))
+    return np.concatenate((np.ravel(a), np.ravel(b)))   # 拼接成一维数组
 
 def deserialize(seq):
     # 反序列化矩阵
@@ -149,14 +149,16 @@ def gradient(theta, X, y):
     a1, z2, a2, z3, h = feed_forward(theta, X)
 
     for i in range(rows):
-        a1i = a1[i, :]      # (1,401)
-        z2i = z2[i, :]      # (1,25)
-        a2i = a2[i, :]      # (1,26)
-        hi = h[i, :]        # (1,10)
-        yi = y[i, :]        # (1,10)
+        # 累计数据的参数误差，最后计算平均值
+        a1i = a1[i, :]      # (1,401)，一维数组
+        z2i = z2[i, :]      # (1,25)，一维数组
+        a2i = a2[i, :]      # (1,26)，一维数组
+        hi = h[i, :]        # (1,10)，一维数组
+        yi = y[i, :]        # (1,10),一维数组
+        # print('yi.shape:', yi.shape)
         d3i = hi - yi       # (1,10)
         z2i = np.insert(z2i, 0, values=np.ones(1))  # 添加偏置单元，（1，26）
-        d2i = np.multiply(theta2.T @ d3i, sigmoid_gradient(z2i))    # (10,26).t @ (1,10) -> (1,26)
+        d2i = np.multiply(theta2.T @ d3i, sigmoid_gradient(z2i))    # (10,26).T @ (10,) -> (26,)
         # print("测试d2i.shape:", d2i.shape)    # (26,)
         delta2 += np.matrix(d3i).T @ np.matrix(a2i)    # (1,10).T @ (1,26) -> (10,26)
         delta1 += np.matrix(d2i[1:]).T @ np.matrix(a1i) #(1,25).T @ (1,401) ->(25,401),这里需要移除偏置单元
@@ -228,11 +230,11 @@ def gradient_checking(theta, X, y, epsilon, regularized=False):
     print('If your backpropagation implementation is correct,'
           '\nthe relative difference will be smaller than 10e-9 (assume epsilon=0.0001).\nRelative Difference: {}\n'.format(diff))
 
-# gradient_checking(theta, X, y, epsilon=0.0001)
+#gradient_checking(theta, X, y, epsilon=0.0001)
 
 # 模型训练
 def random_init(size):
-    # 随机产生参数值
+    # 随机产生size个参数值
     return np.random.uniform(-0.12, 0.12, size)
 
 def nn_training(X, y):
