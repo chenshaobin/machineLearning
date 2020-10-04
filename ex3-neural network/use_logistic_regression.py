@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+    # 识别手写数字（from 0 to 9）
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio      # 读取mat文件
@@ -61,8 +64,9 @@ def plot_100_image(X):
             plt.yticks(np.array([]))
     plt.show()
 
-# plot_100_image(X)
+# plot_100_image(x)
 raw_x, raw_y = load_data('ex3data1.mat')
+# print(raw_y)
 # 数据处理
 # add intercept=1 for x0
 X = np.insert(raw_x, 0, values=np.ones(raw_x.shape[0]), axis=1)     # 在原来的数据上插入了第一列（全部为1）
@@ -129,7 +133,7 @@ def predict(x, theta):
     return (prob >= 0.5).astype(int)    # >=0.5则表示预测正确
 
 """
-final_theta = logistic_regression(X, y[0])  # 仅仅训练判别一种数字，这里只是判别数字10
+final_theta = logistic_regression(X, y[0])  # 仅仅训练判别一种数字，这里只是判别数字0
 # print('final_theta.shape:', final_theta.shape)  # (401,)
 y_prep = predict(X, final_theta)
 print('Accurancy={}'.format(np.mean(y[0] == y_prep)))

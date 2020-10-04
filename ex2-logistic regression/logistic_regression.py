@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-plt.style.use('fivethirtyeight')        #This shows an example of the "fivethirtyeight" styling, which tries to replicate the styles from FiveThirtyEight.com.
+plt.style.use('fivethirtyeight')        # This shows an example of the "fivethirtyeight" styling, which tries to replicate the styles from FiveThirtyEight.com.
 import scipy.optimize as opt     # 利用其中的opt.minimize方法寻找最小参数
 from sklearn.metrics import classification_report  # 这个包是评价报告
 
