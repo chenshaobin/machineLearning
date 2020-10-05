@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set(context="notebook", style="white")
@@ -8,13 +9,30 @@ import numpy as np
 import pandas as pd
 import scipy.io as sio
 
-data_origin = sio.loadmat('data/ex7data1.mat')
+data_origin = sio.loadmat('data/ex7faces.mat')
 # print(data_origin.keys())
-# 初始数据显示
-X = data_origin.get('X')
-# print('X.shape:', X.shape)  # (50,2)
-sns.lmplot('X1', 'X2', data=pd.DataFrame(X, columns=['X1', 'X2']), fit_reg=False)
-# plt.show()
+# 在展示图像之前，需要对图像数据做坐标上的转换
+X = np.array([x.reshape(32, 32).T.reshape(1024) for x in data_origin.get('X')])     #(5000, 1024)
+# print('X.shape:', X.shape)
+
+def plot_n_image(X, n):
+    """
+        #显示n张照片
+        :param X: 已经做好坐标转换后的照片数据
+        :param n: 一个可以开方的数
+        :return: none
+    """
+
+    pic_size = int(np.sqrt(X.shape[1]))      # 图片大小，32X32
+    grid_size = int(np.sqrt(n))  # 网格的行列数，
+    first_n_images = X[:n, :]
+    fig, ax_array = plt.subplots(nrows=grid_size, ncols=grid_size, sharey=True, sharex=True, figsize=(8, 8))
+    for r in range(grid_size):
+        for c in range(grid_size):
+            ax_array[r, c].imshow(first_n_images[grid_size * r + c].reshape((pic_size, pic_size)))
+            plt.xticks(np.array([]))
+            plt.yticks(np.array([]))
+    plt.show()
 
 def normalize(X):
     # 对每一类特征值进行归一化数据，for each column, X-mean / std
@@ -72,40 +90,15 @@ def recover_data(Z, U):
 
     return Z @ U[:, :n].T
 
-# 归一化后的数据显示
-X_norm = normalize(X)
-sns.lmplot('X1', 'X2', data=pd.DataFrame(X_norm, columns=['X1', 'X2']), fit_reg=False)
-# plt.show()
+# plot_n_image(X, n=64)
 
-Sigma = covariance_matrix(X_norm)   #(n, n)
-# print(Sigma)
+# 运行PCA算法，获取特征向量
 U, S, V = pca(X)
-# print(U)    # (n, n)
-
-# 数据降维，降高维数据投射到低维数据
-Z = project_data(X_norm, U, 1)
-# print('Z.shape:', Z.shape)  #(50,1)
-# print('Z[:10]', Z[:10])
-fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(12, 4))
-sns.regplot('X1', 'X2', data=pd.DataFrame(X_norm, columns=['X1', 'X2']), fit_reg=False, ax=ax1)  # 用线性回归模型拟合数据
-ax1.set_title('Original dimension')
-
-sns.rugplot(Z, ax=ax2)      # 用于绘制出一维数组中数据点实际的分布位置情况
-ax2.set_xlabel('Z')
-ax2.set_title('Z dimension')
-# plt.show()
-
+print('U.shape:', U.shape)
+# plot_n_image(U, n=64)
+# 1024维降维到100维
+Z = project_data(X, U, k=100)
+# plot_n_image(Z, n=64)
+# 恢复数据
 X_recover = recover_data(Z, U)
-print('X_recover.shape:', X_recover.shape)
-fig2, (ax1, ax2, ax3) = plt.subplots(ncols=3, figsize=(13, 4))
-
-sns.rugplot(Z, ax=ax1)
-ax1.set_title('Z dimension')
-ax1.set_xlabel('Z')
-
-sns.regplot('X1', 'X2', data=pd.DataFrame(X_recover, columns=['X1', 'X2']), fit_reg=False, ax=ax2)
-ax2.set_title("2D projection from Z")
-
-sns.regplot('X1', 'X2', data=pd.DataFrame(X_norm, columns=['X1', 'X2']), fit_reg=False, ax=ax3)
-ax3.set_title('Original dimension')
-plt.show()
+plot_n_image(X_recover, n=64)
